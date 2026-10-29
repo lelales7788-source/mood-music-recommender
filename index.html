@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>心情音乐推荐器 | Mood Music Recommender</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+      color: #fff;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .container {
+      width: min(860px, 100%);
+      padding: 32px;
+      text-align: center;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.14);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 6px;
+    }
+
+    .language-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+      background: rgba(0, 0, 0, 0.22);
+      border-radius: 999px;
+    }
+
+    .lang-button {
+      padding: 6px 11px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      font-weight: 700;
+      background: transparent;
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .lang-button:hover:not(.active) {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .lang-button.active {
+      color: #222;
+      background: #ffd166;
+    }
+
+    .lang-divider {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 11px;
+    }
+
+    h1 {
+      margin: 10px 0 8px;
+      font-size: clamp(26px, 4vw, 34px);
+      line-height: 1.25;
+    }
+
+    .intro {
+      margin: 0 auto 22px;
+      max-width: 560px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .moods {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin: 28px 0;
+    }
+
+    .mood-button {
+      width: 105px;
+      min-height: 108px;
+      padding: 10px;
+      border: 3px solid transparent;
+      border-radius: 18px;
+      color: #222;
+      background: #fff;
+      cursor: pointer;
+      transition:
+        transform 0.2s,
+        border-color 0.2s,
+        background-color 0.2s;
+    }
+
+    .mood-button:hover,
+    .mood-button:focus-visible {
+      transform: translateY(-5px);
+      border-color: #ffd166;
+      outline: none;
+    }
+
+    .mood-button.selected {
+      border-color: #ffd166;
+      background: #fff3bd;
+      transform: translateY(-5px);
+    }
+
+    .emoji {
+      display: block;
+      font-size: 42px;
+    }
+
+    .mood-name {
+      display: block;
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    .checkmark {
+      display: block;
+      min-height: 18px;
+      margin-top: 4px;
+      color: #157347;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: end;
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
+    .number-control {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      text-align: left;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    select,
+    .action-button {
+      min-height: 44px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      font: inherit;
+    }
+
+    select {
+      color: #222;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .action-button {
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .recommend-button {
+      color: #222;
+      background: #ffd166;
+    }
+
+    .clear-button {
+      color: #fff;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .status {
+      min-height: 24px;
+      margin: 0 0 16px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #fff3bd;
+    }
+
+    .recommendations {
+      display: grid;
+      gap: 18px;
+      text-align: left;
+    }
+
+    .mood-results {
+      padding: 20px;
+      border-radius: 16px;
+      color: #222;
+      background: #fff;
+    }
+
+    .mood-results h2 {
+      margin: 0 0 14px;
+      color: #6441a5;
+      font-size: 20px;
+    }
+
+    .song-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 28px;
+    }
+
+    .song-list li {
+      padding-left: 4px;
+      line-height: 1.5;
+    }
+
+    .song-title {
+      font-weight: bold;
+    }
+
+    .song-subtitle {
+      margin-left: 6px;
+      color: #777;
+      font-size: 13px;
+    }
+
+    .artist {
+      color: #555;
+    }
+
+    @media (max-width: 540px) {
+      .container {
+        padding: 24px 16px;
+      }
+
+      .mood-button {
+        width: 96px;
+      }
+
+      .controls,
+      .number-control,
+      select,
+      .action-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <div class="top-bar">
+      <div class="language-switch" role="group" aria-label="Language / 语言">
+        <button class="lang-button active" type="button" data-lang="zh" aria-pressed="true">中文</button>
+        <span class="lang-divider" aria-hidden="true">|</span>
+        <button class="lang-button" type="button" data-lang="en" aria-pressed="false">English</button>
+      </div>
+    </div>
+
+    <h1 id="pageTitle">心情音乐推荐器</h1>
+    <p class="intro" id="pageIntro">
+      选择一个或多个心情，再决定每种心情想听几首歌。
+    </p>
+
+    <div class="moods" id="moodButtons" role="group" aria-label="选择心情">
+      <!-- 由 JS 动态渲染 -->
+    </div>
+
+    <div class="controls">
+      <label class="number-control" for="songCount">
+        <span id="songsPerMoodLabel">每种心情歌曲数</span>
+        <select id="songCount"></select>
+      </label>
+
+      <button class="action-button recommend-button" id="recommendButton" type="button">
+        推荐歌曲
+      </button>
+
+      <button class="action-button clear-button" id="clearButton" type="button">
+        清空选择
+      </button>
+    </div>
+
+    <p class="status" id="status" aria-live="polite">
+      尚未选择心情。
+    </p>
+
+    <section
+      class="recommendations"
+      id="recommendations"
+      aria-label="歌曲推荐"
+      aria-live="polite"
+    ></section>
+  </main>
+
+  <script>
+    const UI = {
+      zh: {
+        "page.title": "心情音乐推荐器",
+        "page.intro": "选择一个或多个心情，再决定每种心情想听几首歌。",
+        "moods.aria": "选择心情",
+        "songsPerMood": "每种心情歌曲数",
+        "songCount.option": "{count} 首",
+        "button.recommend": "推荐歌曲",
+        "button.clear": "清空选择",
+        "status.noMoods": "尚未选择心情。",
+        "status.selected": "已选择 {count} 种心情：{names}",
+        "status.error": "请至少选择一种心情。",
+        "status.showing": "正在显示 {total} 首推荐歌曲，覆盖 {moodCount} 种已选心情。",
+        "selected.mark": "✓ 已选",
+        "recommendations.aria": "歌曲推荐",
+        "song.subtitle": "英文名"
+      },
+      en: {
+        "page.title": "Mood Music Recommender",
+        "page.intro": "Select one or more moods, then choose how many songs you want per mood.",
+        "moods.aria": "Select moods",
+        "songsPerMood": "Songs per mood",
+        "songCount.option": "{count} song{suffix}",
+        "button.recommend": "Recommend Songs",
+        "button.clear": "Clear Selection",
+        "status.noMoods": "No moods selected.",
+        "status.selected": "{count} mood{suffix} selected: {names}",
+        "status.error": "Please select at least one mood.",
+        "status.showing": "Showing {total} recommendation{suffix} across {moodCount} selected mood{moodSuffix}.",
+        "selected.mark": "✓ Selected",
+        "recommendations.aria": "Song recommendations",
+        "song.subtitle": "Chinese title"
+      }
+    };
+
+    const MOODS = {
+      happy: {
+        emoji: "😊",
+        label: { zh: "开心", en: "Happy" },
+        songs: [
+          { title: "好心情", subtitle: "Good Mood", artist: "李玟" },
+          { title: "稻香", subtitle: "Rice Field", artist: "周杰伦" },
+          { title: "彩虹的微笑", subtitle: "Rainbow Smile", artist: "王心凌" },
+          { title: "第一天", subtitle: "First Day", artist: "孙燕姿" },
+          { title: "日不落", subtitle: "Sun Never Sets", artist: "蔡依林" },
+          { title: "恋爱ing", subtitle: "Love-ing", artist: "五月天" },
+          { title: "快乐崇拜", subtitle: "Happy Worship", artist: "潘玮柏 / 张韶涵" },
+          { title: "阳光彩虹小白马", subtitle: "Sunshine Rainbow Little White Horse", artist: "大张伟" },
+          { title: "我的未来式", subtitle: "My Future Style", artist: "郭采洁" },
+          { title: "桃花朵朵开", subtitle: "Peach Blossoms Bloom", artist: "阿牛" },
+          { title: "爱的主打歌", subtitle: "Love's Signature Song", artist: "萧亚轩" },
+          { title: "欧若拉", subtitle: "Aurora", artist: "张韶涵" },
+          { title: "酸甜", subtitle: "Sweet and Sour", artist: "S.H.E / 飞轮海" },
+          { title: "海芋恋", subtitle: "Calla Lily Love", artist: "萧敬腾" },
+          { title: "凑热闹", subtitle: "Join the Fun", artist: "By2" },
+          { title: "马德里不思议", subtitle: "Madrid Mystery", artist: "蔡依林" },
+          { title: "快乐女孩", subtitle: "Happy Girl", artist: "刘惜君" },
+          { title: "娃娃脸", subtitle: "Baby Face", artist: "后弦" },
+          { title: "超喜欢你", subtitle: "Like You So Much", artist: "飞轮海" },
+          { title: "小小虫", subtitle: "Little Bug", artist: "方大同" }
+        ]
+      },
+
+      sad: {
+        emoji: "😢",
+        label: { zh: "伤感", en: "Sad" },
+        songs: [
+          { title: "慢冷", subtitle: "Slowly Cold", artist: "梁静茹" },
+          { title: "不遗憾", subtitle: "No Regrets", artist: "李荣浩" },
+          { title: "唯一", subtitle: "Only", artist: "告五人" },
+          { title: "猜不透", subtitle: "Can't Figure Out", artist: "丁当" },
+          { title: "如果你也听说", subtitle: "If You've Heard", artist: "张惠妹" },
+          { title: "雨下一整晚", subtitle: "Raining All Night", artist: "周杰伦" },
+          { title: "带我走", subtitle: "Take Me Away", artist: "杨丞琳" },
+          { title: "一样的月光", subtitle: "Same Moonlight", artist: "徐佳莹" },
+          { title: "背叛", subtitle: "Betrayal", artist: "曹格" },
+          { title: "童话", subtitle: "Fairy Tale", artist: "光良" },
+          { title: "无人知晓的我", subtitle: "The Me Nobody Knows", artist: "A-Lin" },
+          { title: "爱情讯息", subtitle: "Love Message", artist: "郭静" },
+          { title: "最初的记忆", subtitle: "First Memory", artist: "徐佳莹" },
+          { title: "拉过勾的", subtitle: "Pinky Promise", artist: "陆虎" },
+          { title: "同花顺", subtitle: "Flush", artist: "林其玉" },
+          { title: "命运", subtitle: "Fate", artist: "家家" },
+          { title: "失眠", subtitle: "Insomnia", artist: "Suki 刘舒妤" },
+          { title: "碎碎念", subtitle: "Muttering", artist: "队长" },
+          { title: "如果呢", subtitle: "What If", artist: "郑润泽" },
+          { title: "用背脊唱情歌", subtitle: "Singing Love Songs with My Back", artist: "汤令山" }
+        ]
+      },
+
+      energetic: {
+        emoji: "⚡",
+        label: { zh: "活力", en: "Energetic" },
+        songs: [
+          { title: "光年之外", subtitle: "Light Years Away", artist: "邓紫棋" },
+          { title: "阳光宅男", subtitle: "Sunshine Otaku", artist: "周杰伦" },
+          { title: "Play我呸", subtitle: "Play I Pfft", artist: "蔡依林" },
+          { title: "王妃", subtitle: "Princess", artist: "萧敬腾" },
+          { title: "将军令", subtitle: "General's Order", artist: "吴克群" },
+          { title: "曹操", subtitle: "Cao Cao", artist: "林俊杰" },
+          { title: "逆战", subtitle: "Reverse War", artist: "张杰" },
+          { title: "着魔", subtitle: "Obsessed", artist: "张杰" },
+          { title: "即刻出发", subtitle: "Set Off Now", artist: "吉克隽逸" },
+          { title: "热血无赖", subtitle: "Hot-Blooded Rogue", artist: "邓紫棋" },
+          { title: "饿狼传说", subtitle: "Legend of the Hungry Wolf", artist: "张学友" },
+          { title: "头发乱了", subtitle: "Hair Messed Up", artist: "张学友" },
+          { title: "眉飞色舞", subtitle: "Beaming with Joy", artist: "郑秀文" },
+          { title: "不如跳舞", subtitle: "Better Dance", artist: "陈慧琳" },
+          { title: "花花宇宙", subtitle: "Flower Universe", artist: "陈慧琳" },
+          { title: "Monica", subtitle: "Monica", artist: "张国荣" },
+          { title: "不羁的风", subtitle: "Unrestrained Wind", artist: "张国荣" },
+          { title: "全日爱", subtitle: "All-Day Love", artist: "黎明" },
+          { title: "眼睛想旅行", subtitle: "Eyes Want to Travel", artist: "黎明" },
+          { title: "煞科", subtitle: "Finale", artist: "郑秀文" }
+        ]
+      },
+
+      calm: {
+        emoji: "😌",
+        label: { zh: "平静", en: "Calm" },
+        songs: [
+          { title: "山茶花开了", subtitle: "Camellia Bloomed", artist: "民歌风格原创" },
+          { title: "尘光慢语", subtitle: "Slow Words of Dust and Light", artist: "民歌风格原创" },
+          { title: "一叶知秋", subtitle: "One Leaf Signals Autumn", artist: "民歌风格原创" },
+          { title: "夏至的夜", subtitle: "Midsummer Night", artist: "民歌风格原创" },
+          { title: "海风拂过", subtitle: "Sea Breeze Brushes By", artist: "民歌风格原创" },
+          { title: "风里的车票", subtitle: "Ticket in the Wind", artist: "民歌风格原创" },
+          { title: "把远方折好", subtitle: "Fold the Distance Away", artist: "民歌风格原创" },
+          { title: "北站", subtitle: "North Station", artist: "民歌风格原创" },
+          { title: "山海路口", subtitle: "Mountain-Sea Crossing", artist: "民歌风格原创" },
+          { title: "给远路的情书", subtitle: "Love Letter to the Long Road", artist: "民歌风格原创" },
+          { title: "雾渡相思", subtitle: "Crossing Yearning in Mist", artist: "民歌风格原创" },
+          { title: "月下的小广场", subtitle: "Little Square Under the Moon", artist: "民歌风格原创" },
+          { title: "花径晴光", subtitle: "Sunlight on Flower Path", artist: "民歌风格原创" },
+          { title: "把月色交给你", subtitle: "Give You the Moonlight", artist: "民歌风格原创" },
+          { title: "窗纱轻落", subtitle: "Window Gauze Falls Gently", artist: "民歌风格原创" },
+          { title: "寻你千百度", subtitle: "Searching for You a Thousand Times", artist: "深夜小酒馆" },
+          { title: "晚风里的折叠", subtitle: "Folding in the Evening Breeze", artist: "深夜小酒馆" },
+          { title: "未落款的长情", subtitle: "Unsigned Long Love", artist: "深夜小酒馆" },
+          { title: "那一秒的惊艳", subtitle: "That Second of Splendor", artist: "深夜小酒馆" },
+          { title: "时光的朱砂", subtitle: "Cinnabar of Time", artist: "深夜小酒馆" }
+        ]
+      },
+
+      romantic: {
+        emoji: "😍",
+        label: { zh: "浪漫", en: "Romantic" },
+        songs: [
+          { title: "月亮代表我的心", subtitle: "The Moon Represents My Heart", artist: "邓丽君" },
+          { title: "甜蜜蜜", subtitle: "Sweet Honey", artist: "邓丽君" },
+          { title: "我愿意", subtitle: "I Do", artist: "王菲" },
+          { title: "最浪漫的事", subtitle: "The Most Romantic Thing", artist: "赵咏华" },
+          { title: "明明白白我的心", subtitle: "My Heart Is Clear", artist: "成龙 / 陈淑桦" },
+          { title: "明天我要嫁给你", subtitle: "Tomorrow I'll Marry You", artist: "周华健" },
+          { title: "喜欢你", subtitle: "Like You", artist: "Beyond" },
+          { title: "爱情宣言", subtitle: "Love Declaration", artist: "齐秦" },
+          { title: "爱的代价", subtitle: "The Price of Love", artist: "张艾嘉" },
+          { title: "每天爱你多一些", subtitle: "Love You a Little More Every Day", artist: "张学友" },
+          { title: "相依为命", subtitle: "Depend on Each Other", artist: "陈小春" },
+          { title: "我的宣言", subtitle: "My Declaration", artist: "周柏豪" },
+          { title: "今生今世", subtitle: "This Life and Beyond", artist: "张国荣" },
+          { title: "天下无双", subtitle: "Peerless", artist: "陈奕迅" },
+          { title: "我们万岁", subtitle: "Long Live Us", artist: "陈奕迅" },
+          { title: "分分钟需要你", subtitle: "Need You Every Minute", artist: "林子祥" },
+          { title: "陪着你走", subtitle: "Walk with You", artist: "卢冠廷" },
+          { title: "一生爱你一个", subtitle: "Love Only You in This Life", artist: "郑伊健" },
+          { title: "三生有幸", subtitle: "Fortunate for Three Lives", artist: "郑中基" },
+          { title: "难得一遇", subtitle: "Rare Encounter", artist: "林奕匡" }
+        ]
+      }
+    };
+
+    const MOOD_KEYS = Object.keys(MOODS);
+    const selectedMoods = new Set();
+    let lang = "zh";
+
+    const pageTitle = document.getElementById("pageTitle");
+    const pageIntro = document.getElementById("pageIntro");
+    const moodButtonsWrap = document.getElementById("moodButtons");
+    const songsPerMoodLabel = document.getElementById("songsPerMoodLabel");
+    const songCount = document.getElementById("songCount");
+    const recommendButton = document.getElementById("recommendButton");
+    const clearButton = document.getElementById("clearButton");
+    const status = document.getElementById("status");
+    const recommendations = document.getElementById("recommendations");
+
+    function t(key, vars = {}) {
+      const dictionary = UI[lang] || UI.zh;
+      const template = dictionary[key] || UI.zh[key] || key;
+
+      return template.replace(/\{(\w+)\}/g, (match, name) => {
+        if (Object.prototype.hasOwnProperty.call(vars, name)) {
+          return String(vars[name]);
+        }
+        if (name === "suffix") {
+          return lang === "en" && vars.count !== 1 ? "s" : "";
+        }
+        if (name === "moodSuffix") {
+          return lang === "en" && vars.moodCount !== 1 ? "s" : "";
+        }
+        return match;
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => {
+        const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+        return map[char];
+      });
+    }
+
+    function moodLabel(moodKey) {
+      return MOODS[moodKey].label[lang];
+    }
+
+    function updateStaticText() {
+      document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+      document.title = lang === "zh"
+        ? "心情音乐推荐器 | Mood Music Recommender"
+        : "Mood Music Recommender | 心情音乐推荐器";
+
+      pageTitle.textContent = t("page.title");
+      pageIntro.textContent = t("page.intro");
+      moodButtonsWrap.setAttribute("aria-label", t("moods.aria"));
+      songsPerMoodLabel.textContent = t("songsPerMood");
+      recommendButton.textContent = t("button.recommend");
+      clearButton.textContent = t("button.clear");
+      recommendations.setAttribute("aria-label", t("recommendations.aria"));
+
+      renderSongCountOptions();
+      renderMoodButtons();
+      updateStatus();
+      renderRecommendationsFromState();
+    }
+
+    function renderSongCountOptions() {
+      const currentValue = songCount.value || "3";
+      songCount.innerHTML = [1, 2, 3, 4, 5].map((count) => {
+        return `<option value="${count}">${escapeHtml(t("songCount.option", { count }))}</option>`;
+      }).join("");
+      songCount.value = currentValue;
+    }
+
+    function renderMoodButtons() {
+      moodButtonsWrap.innerHTML = MOOD_KEYS.map((moodKey) => {
+        const mood = MOODS[moodKey];
+        const isSelected = selectedMoods.has(moodKey);
+
+        return `
+          <button
+            class="mood-button ${isSelected ? "selected" : ""}"
+            type="button"
+            data-mood="${moodKey}"
+            aria-pressed="${isSelected}"
+          >
+            <span class="emoji" aria-hidden="true">${mood.emoji}</span>
+            <span class="mood-name">${escapeHtml(mood.label[lang])}</span>
+            <span class="checkmark" aria-hidden="true">${isSelected ? escapeHtml(t("selected.mark")) : ""}</span>
+          </button>
+        `;
+      }).join("");
+
+      moodButtonsWrap.querySelectorAll(".mood-button").forEach((button) => {
+        button.addEventListener("click", () => toggleMood(button.dataset.mood));
+      });
+    }
+
+    function toggleMood(moodKey) {
+      if (selectedMoods.has(moodKey)) {
+        selectedMoods.delete(moodKey);
+      } else {
+        selectedMoods.add(moodKey);
+      }
+
+      renderMoodButtons();
+      updateStatus();
+    }
+
+    function updateStatus() {
+      status.classList.remove("error");
+
+      if (selectedMoods.size === 0) {
+        status.textContent = t("status.noMoods");
+        return;
+      }
+
+      const names = [...selectedMoods].map((moodKey) => {
+        return `${MOODS[moodKey].emoji} ${moodLabel(moodKey)}`;
+      });
+
+      status.textContent = t("status.selected", {
+        count: selectedMoods.size,
+        names: names.join(lang === "zh" ? "、" : ", ")
+      });
+    }
+
+    function getRandomSongs(songList, amount) {
+      const shuffled = [...songList];
+
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const randomIndex = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]];
+      }
+
+      return shuffled.slice(0, amount);
+    }
+
+    let currentRecommendationState = null;
+
+    function renderRecommendationsFromState() {
+      if (!currentRecommendationState) {
+        recommendations.replaceChildren();
+        return;
+      }
+
+      const { results, amount } = currentRecommendationState;
+      recommendations.replaceChildren();
+
+      results.forEach(({ moodKey, songs }) => {
+        const mood = MOODS[moodKey];
+        const section = document.createElement("article");
+        const heading = document.createElement("h2");
+        const list = document.createElement("ol");
+
+        section.className = "mood-results";
+        list.className = "song-list";
+
+        heading.textContent = `${mood.emoji} ${mood.label[lang]}`;
+
+        songs.forEach((song) => {
+          const item = document.createElement("li");
+          const title = document.createElement("span");
+          const subtitle = document.createElement("span");
+          const artist = document.createElement("span");
+
+          title.className = "song-title";
+          subtitle.className = "song-subtitle";
+          artist.className = "artist";
+
+          title.textContent = song.title;
+          subtitle.textContent = `（${t("song.subtitle")}: ${song.subtitle}）`;
+          artist.textContent = ` — ${song.artist}`;
+
+          item.append(title, subtitle, artist);
+          list.appendChild(item);
+        });
+
+        section.append(heading, list);
+        recommendations.appendChild(section);
+      });
+
+      const total = selectedMoods.size * amount;
+      status.classList.remove("error");
+      status.textContent = t("status.showing", {
+        total,
+        moodCount: selectedMoods.size
+      });
+    }
+
+    recommendButton.addEventListener("click", () => {
+      if (selectedMoods.size === 0) {
+        status.textContent = t("status.error");
+        status.classList.add("error");
+        recommendations.replaceChildren();
+        currentRecommendationState = null;
+        return;
+      }
+
+      const amount = Number(songCount.value);
+      const results = [...selectedMoods].map((moodKey) => ({
+        moodKey,
+        songs: getRandomSongs(MOODS[moodKey].songs, amount)
+      }));
+
+      currentRecommendationState = { results, amount };
+      renderRecommendationsFromState();
+    });
+
+    clearButton.addEventListener("click", () => {
+      selectedMoods.clear();
+      currentRecommendationState = null;
+      recommendations.replaceChildren();
+      renderMoodButtons();
+      updateStatus();
+    });
+
+    document.querySelectorAll(".lang-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextLang = button.dataset.lang;
+        if (nextLang === lang) {
+          return;
+        }
+
+        lang = nextLang;
+
+        document.querySelectorAll(".lang-button").forEach((langButton) => {
+          const active = langButton.dataset.lang === lang;
+          langButton.classList.toggle("active", active);
+          langButton.setAttribute("aria-pressed", String(active));
+        });
+
+        updateStaticText();
+      });
+    });
+
+    updateStaticText();
+  </script>
+</body>
+</html>
