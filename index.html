@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -6,29 +8,75 @@
   <title>心情音乐推荐器 | Mood Music Recommender</title>
 
   <style>
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #fcf9f4;
+      --card: #ffffff;
+      --line: #70564a;
+      --line-soft: #b8a8a0;
+      --text: #4a3a34;
+      --text-soft: #8f7c74;
+      --accent: #e59078;
+      --accent-soft: #f8cdbe;
+      --purple: #a7a3b1;
+      --purple-soft: #d5d0df;
+      --blue: #b2cde0;
+      --blue-soft: #e3eef5;
+      --yellow: #f6df9e;
+      --bg-dot: rgba(112, 86, 74, 0.06);
     }
+
+    html { scroll-behavior: smooth; }
 
     body {
       min-height: 100vh;
       margin: 0;
-      padding: 24px;
+      padding: 30px 20px 50px;
       display: grid;
       place-items: center;
-      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
-      color: #fff;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: "Nunito", "Comic Sans MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(var(--bg-dot) 1.5px, transparent 1.5px),
+        radial-gradient(var(--bg-dot) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
     }
 
     .container {
-      width: min(860px, 100%);
-      padding: 32px;
+      position: relative;
+      width: min(840px, 100%);
+      padding: 42px 36px 38px;
       text-align: center;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.14);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(10px);
+      background: var(--card);
+      border: 3px solid var(--line);
+      border-radius: 40px;
+      box-shadow: 0 18px 40px rgba(112, 86, 74, 0.08);
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      top: -15px;
+      left: -15px;
+      width: 40px;
+      height: 40px;
+      border: 3px dashed var(--accent-soft);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .container::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      right: -10px;
+      width: 24px;
+      height: 24px;
+      border: 3px dashed var(--blue);
+      border-radius: 50%;
+      pointer-events: none;
     }
 
     .top-bar {
@@ -40,237 +88,322 @@
     .language-switch {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 5px;
-      background: rgba(0, 0, 0, 0.22);
-      border-radius: 999px;
+      gap: 6px;
+      padding: 6px 10px;
+      background: var(--bg);
+      border: 2px solid var(--line);
+      border-radius: 30px;
     }
 
     .lang-button {
-      padding: 6px 11px;
-      color: rgba(255, 255, 255, 0.7);
+      padding: 5px 14px;
+      color: var(--text-soft);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       background: transparent;
       border: 0;
-      border-radius: 999px;
+      border-radius: 20px;
       cursor: pointer;
-      transition: color 0.2s, background 0.2s;
+      transition: all 0.2s;
     }
 
     .lang-button:hover:not(.active) {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      background: var(--bg-dot);
     }
 
     .lang-button.active {
-      color: #222;
-      background: #ffd166;
+      color: var(--line);
+      background: var(--yellow);
     }
 
     .lang-divider {
-      color: rgba(255, 255, 255, 0.35);
+      color: var(--line-soft);
       font-size: 11px;
     }
 
     h1 {
-      margin: 10px 0 8px;
-      font-size: clamp(26px, 4vw, 34px);
-      line-height: 1.25;
+      margin: 16px 0 10px;
+      font-size: clamp(28px, 4vw, 36px);
+      line-height: 1.3;
+      font-weight: 900;
+      color: var(--line);
+      letter-spacing: 0.02em;
     }
 
     .intro {
-      margin: 0 auto 22px;
-      max-width: 560px;
-      color: rgba(255, 255, 255, 0.86);
+      margin: 12px auto 26px;
+      max-width: 520px;
+      color: var(--text-soft);
       font-size: 15px;
-      line-height: 1.65;
+      font-weight: 700;
+      line-height: 1.6;
     }
 
     .moods {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 14px;
-      margin: 28px 0;
+      gap: 18px;
+      margin: 28px 0 18px;
     }
 
     .mood-button {
-      width: 105px;
-      min-height: 108px;
-      padding: 10px;
-      border: 3px solid transparent;
-      border-radius: 18px;
-      color: #222;
-      background: #fff;
+      position: relative;
+      width: 110px;
+      min-height: 118px;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      background: var(--card);
+      border: 2.5px solid var(--line);
+      border-radius: 28px;
       cursor: pointer;
-      transition:
-        transform 0.2s,
-        border-color 0.2s,
-        background-color 0.2s;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 0 rgba(112, 86, 74, 0.08);
     }
+
+    .mood-button:nth-child(odd)  { transform: rotate(-1.5deg); }
+    .mood-button:nth-child(even) { transform: rotate(1.5deg); }
 
     .mood-button:hover,
     .mood-button:focus-visible {
-      transform: translateY(-5px);
-      border-color: #ffd166;
+      transform: translateY(-5px) rotate(0);
+      box-shadow: 0 10px 0 rgba(112, 86, 74, 0.12);
       outline: none;
     }
 
     .mood-button.selected {
-      border-color: #ffd166;
-      background: #fff3bd;
-      transform: translateY(-5px);
+      background: #fffaf0;
+      border-color: var(--accent);
+      transform: translateY(-5px) rotate(0);
+      box-shadow: 0 10px 0 var(--accent-soft);
     }
 
-    .emoji {
-      display: block;
-      font-size: 42px;
+    .mood-icon {
+      width: 58px;
+      height: 58px;
+      margin-bottom: 6px;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .mood-button:hover .mood-icon,
+    .mood-button.selected .mood-icon {
+      transform: scale(1.1) rotate(4deg);
     }
 
     .mood-name {
-      display: block;
-      margin-top: 6px;
-      font-weight: bold;
+      font-weight: 900;
+      font-size: 15px;
+      color: var(--line);
     }
 
     .checkmark {
-      display: block;
-      min-height: 18px;
+      min-height: 16px;
       margin-top: 4px;
-      color: #157347;
+      color: var(--accent);
       font-size: 12px;
-      font-weight: bold;
+      font-weight: 900;
     }
 
     .controls {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: end;
-      gap: 14px;
-      margin-bottom: 26px;
+      align-items: flex-end;
+      gap: 18px;
+      margin: 26px 0 20px;
     }
 
     .number-control {
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 8px;
       text-align: left;
-      font-weight: bold;
-      color: #fff;
+      font-weight: 900;
+      color: var(--line);
+      font-size: 14px;
     }
 
     select,
     .action-button {
-      min-height: 44px;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 10px;
+      min-height: 46px;
+      padding: 10px 20px;
       font: inherit;
+      font-weight: 900;
+      color: var(--line);
+      border: 2.5px solid var(--line);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 0 rgba(112, 86, 74, 0.15);
     }
 
     select {
-      color: #222;
-      background: #fff;
-      cursor: pointer;
+      background: var(--card);
+      appearance: none;
+      padding-right: 36px;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2370564a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 14px;
     }
 
-    .action-button {
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-    }
+    .action-button { background: var(--card); }
+    .action-button:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(112, 86, 74, 0.15); }
+    .action-button:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(112, 86, 74, 0.15); }
 
-    .action-button:hover {
-      transform: translateY(-2px);
-    }
-
-    .recommend-button {
-      color: #222;
-      background: #ffd166;
-    }
-
-    .clear-button {
-      color: #fff;
-      background: rgba(0, 0, 0, 0.3);
-    }
+    .recommend-button { background: var(--blue); color: var(--line); }
+    .clear-button { background: var(--purple-soft); }
 
     .status {
       min-height: 24px;
-      margin: 0 0 16px;
-      font-weight: bold;
+      margin: 0 0 20px;
+      font-weight: 800;
       font-size: 14px;
+      color: var(--text-soft);
     }
 
-    .error {
-      color: #fff3bd;
-    }
+    .error { color: #d9654b; }
 
     .recommendations {
       display: grid;
-      gap: 18px;
+      gap: 22px;
       text-align: left;
     }
 
     .mood-results {
-      padding: 20px;
-      border-radius: 16px;
-      color: #222;
-      background: #fff;
+      padding: 24px;
+      background: #fdfaf6;
+      border: 2.5px solid var(--line);
+      border-radius: 30px;
     }
 
     .mood-results h2 {
-      margin: 0 0 14px;
-      color: #6441a5;
-      font-size: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 18px;
+      padding: 6px 16px;
+      font-size: 18px;
+      color: var(--line);
+      background: var(--blue-soft);
+      border: 2px solid var(--line);
+      border-radius: 20px;
+      transform: rotate(-1deg);
+    }
+
+    .mood-results h2 svg {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
     }
 
     .song-list {
       display: grid;
-      gap: 10px;
+      gap: 16px;
       margin: 0;
-      padding-left: 28px;
+      padding-left: 24px;
     }
 
     .song-list li {
-      padding-left: 4px;
-      line-height: 1.5;
+      padding-left: 6px;
+      line-height: 1.6;
+      color: var(--text);
     }
 
-    .song-title {
-      font-weight: bold;
+    .song-list li::marker {
+      color: var(--accent);
+      font-weight: 900;
     }
 
-    .song-subtitle {
+    .song-line {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .song-title { font-weight: 900; color: var(--line); }
+    .artist { color: var(--text-soft); font-weight: 700; }
+
+    .preview-btn {
       margin-left: 6px;
-      color: #777;
-      font-size: 13px;
+      padding: 4px 14px;
+      color: var(--line);
+      font-size: 12px;
+      font-weight: 900;
+      background: var(--yellow);
+      border: 2px solid var(--line);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 3px 0 rgba(112, 86, 74, 0.15);
     }
 
-    .artist {
-      color: #555;
+    .preview-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(112, 86, 74, 0.15); }
+    .preview-btn:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 2px 0 rgba(112, 86, 74, 0.15); }
+    .preview-btn[data-state="playing"] { color: #fff; background: var(--accent); }
+    .preview-btn[data-state="loading"] { opacity: 0.8; cursor: progress; }
+    .preview-btn:disabled { color: var(--line-soft); background: #eeeae6; border-color: var(--line-soft); box-shadow: none; cursor: not-allowed; }
+
+    .lyrics-panel {
+      position: relative;
+      height: 128px;
+      margin-top: 12px;
+      overflow: hidden;
+      background: var(--card);
+      border: 2px solid var(--line-soft);
+      border-radius: 20px;
+      text-align: left;
     }
 
-    @media (max-width: 540px) {
-      .container {
-        padding: 24px 16px;
-      }
+    .lyrics-panel[hidden] { display: none; }
 
-      .mood-button {
-        width: 96px;
-      }
+    .lyrics-panel::before,
+    .lyrics-panel::after {
+      content: ""; position: absolute; left: 0; right: 0; height: 16px; pointer-events: none; z-index: 2;
+    }
+    .lyrics-panel::before { top: 0; background: linear-gradient(180deg, var(--card) 10%, transparent); }
+    .lyrics-panel::after { bottom: 0; background: linear-gradient(0deg, var(--card) 10%, transparent); }
 
-      .controls,
-      .number-control,
-      select,
-      .action-button {
-        width: 100%;
-      }
+    .lyrics-track {
+      padding: 48px 20px;
+      transition: transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+      will-change: transform;
+    }
+
+    .lyric-line {
+      height: 32px; margin: 0; line-height: 32px; color: var(--line-soft);
+      font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: all 0.2s;
+    }
+
+    .lyric-line.lyric-meta { color: var(--text-soft); font-size: 12px; opacity: 0.7; }
+    .lyric-line.active { color: var(--line); font-weight: 900; font-size: 15px; }
+    .lyric-line.active::before { content: "❀ "; color: var(--accent); }
+
+    .lyrics-status {
+      position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%);
+      margin: 0; padding: 0 16px; color: var(--text-soft); font-size: 13px; font-weight: 700; text-align: center;
+    }
+
+    .lyrics-warning {
+      position: absolute; bottom: 4px; left: 8px; right: 8px;
+      color: #c9953b; font-size: 11px; font-weight: 700; text-align: center; pointer-events: none;
+    }
+
+    @media (max-width: 560px) {
+      .container { padding: 28px 20px; border-radius: 30px; }
+      .mood-button { width: 96px; min-height: 106px; }
+      .mood-icon { width: 48px; height: 48px; }
+      .controls, .number-control, select, .action-button { width: 100%; }
     }
   </style>
 </head>
-
 <body>
   <main class="container">
     <div class="top-bar">
@@ -282,39 +415,21 @@
     </div>
 
     <h1 id="pageTitle">心情音乐推荐器</h1>
-    <p class="intro" id="pageIntro">
-      选择一个或多个心情，再决定每种心情想听几首歌。
-    </p>
+    <p class="intro" id="pageIntro">选择一个或多个心情，再决定每种心情想听几首歌。</p>
 
-    <div class="moods" id="moodButtons" role="group" aria-label="选择心情">
-      <!-- 由 JS 动态渲染 -->
-    </div>
+    <div class="moods" id="moodButtons" role="group" aria-label="选择心情"></div>
 
     <div class="controls">
       <label class="number-control" for="songCount">
         <span id="songsPerMoodLabel">每种心情歌曲数</span>
         <select id="songCount"></select>
       </label>
-
-      <button class="action-button recommend-button" id="recommendButton" type="button">
-        推荐歌曲
-      </button>
-
-      <button class="action-button clear-button" id="clearButton" type="button">
-        清空选择
-      </button>
+      <button class="action-button recommend-button" id="recommendButton" type="button">推荐歌曲</button>
+      <button class="action-button clear-button" id="clearButton" type="button">清空选择</button>
     </div>
 
-    <p class="status" id="status" aria-live="polite">
-      尚未选择心情。
-    </p>
-
-    <section
-      class="recommendations"
-      id="recommendations"
-      aria-label="歌曲推荐"
-      aria-live="polite"
-    ></section>
+    <p class="status" id="status" aria-live="polite">尚未选择心情。</p>
+    <section class="recommendations" id="recommendations" aria-label="歌曲推荐" aria-live="polite"></section>
   </main>
 
   <script>
@@ -333,7 +448,14 @@
         "status.showing": "正在显示 {total} 首推荐歌曲，覆盖 {moodCount} 种已选心情。",
         "selected.mark": "✓ 已选",
         "recommendations.aria": "歌曲推荐",
-        "song.subtitle": "英文名"
+        "preview.idle": "试听",
+        "preview.loading": "加载中",
+        "preview.playing": "暂停",
+        "preview.paused": "继续",
+        "preview.unavailable": "暂无音源",
+        "lyrics.loading": "歌词加载中",
+        "lyrics.unavailable": "暂无同步歌词",
+        "lyrics.fragmentWarning": "此曲目使用试听片段，歌词可能不完全同步"
       },
       en: {
         "page.title": "Mood Music Recommender",
@@ -349,150 +471,240 @@
         "status.showing": "Showing {total} recommendation{suffix} across {moodCount} selected mood{moodSuffix}.",
         "selected.mark": "✓ Selected",
         "recommendations.aria": "Song recommendations",
-        "song.subtitle": "Chinese title"
+        "preview.idle": "Play",
+        "preview.loading": "Loading",
+        "preview.playing": "Pause",
+        "preview.paused": "Resume",
+        "preview.unavailable": "No audio",
+        "lyrics.loading": "Loading lyrics",
+        "lyrics.unavailable": "No synced lyrics available",
+        "lyrics.fragmentWarning": "This track uses a preview clip; lyrics may not be fully in sync"
       }
+    };
+
+    const SVG_ICONS = {
+      happy: `
+        <svg class="mood-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10C23 10 10 27 10 50C10 73 23 90 50 90C77 90 90 73 90 50C90 27 77 10 50 10Z" fill="#FFF3E8" stroke="#70564A" stroke-width="4"/>
+          <path d="M15 45C15 20 30 15 50 15C70 15 85 20 85 45" stroke="#B3887D" stroke-width="8" stroke-linecap="round"/>
+          <path d="M25 40L35 50M75 40L65 50" stroke="#B3887D" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="26" cy="60" rx="8" ry="5" fill="#F4A88B" opacity="0.6"/>
+          <ellipse cx="74" cy="60" rx="8" ry="5" fill="#F4A88B" opacity="0.6"/>
+          <path d="M30 50 Q37 43 44 50" stroke="#70564A" stroke-width="4" stroke-linecap="round"/>
+          <path d="M56 50 Q63 43 70 50" stroke="#70564A" stroke-width="4" stroke-linecap="round"/>
+          <path d="M40 62 Q50 72 60 62" stroke="#70564A" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="20" cy="30" r="3" fill="#B2CDE0"/>
+          <circle cx="80" cy="30" r="4" fill="#B2CDE0"/>
+        </svg>
+      `,
+      sad: `
+        <svg class="mood-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10C23 10 10 27 10 50C10 73 23 90 50 90C77 90 90 73 90 50C90 27 77 10 50 10Z" fill="#FFF3E8" stroke="#70564A" stroke-width="4"/>
+          <path d="M15 45C15 20 30 15 50 15C70 15 85 20 85 45" stroke="#B3887D" stroke-width="8" stroke-linecap="round"/>
+          <path d="M25 40L35 50M75 40L65 50" stroke="#B3887D" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="26" cy="60" rx="8" ry="5" fill="#F4A88B" opacity="0.6"/>
+          <ellipse cx="74" cy="60" rx="8" ry="5" fill="#F4A88B" opacity="0.6"/>
+          <path d="M30 55 Q35 50 40 55" stroke="#70564A" stroke-width="4" stroke-linecap="round"/>
+          <path d="M60 55 Q65 50 70 55" stroke="#70564A" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="35" cy="52" r="2.5" fill="#70564A"/>
+          <circle cx="65" cy="52" r="2.5" fill="#70564A"/>
+          <path d="M45 65 Q50 62 55 65" stroke="#70564A" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M30 62 Q30 72 35 72 Q40 72 40 62 Z" fill="#B2CDE0"/>
+        </svg>
+      `,
+      energetic: `
+        <svg class="mood-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10C23 10 10 27 10 50C10 73 23 90 50 90C77 90 90 73 90 50C90 27 77 10 50 10Z" fill="#FFF3E8" stroke="#70564A" stroke-width="4"/>
+          <path d="M15 45C15 20 30 15 50 15C70 15 85 20 85 45" stroke="#B3887D" stroke-width="8" stroke-linecap="round"/>
+          <path d="M25 40L35 50M75 40L65 50" stroke="#B3887D" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="26" cy="60" rx="8" ry="5" fill="#F4A88B" opacity="0.6"/>
+          <ellipse cx="74" cy="60" rx="8" ry="5" fill="#F4A88B" opacity="0.6"/>
+          <path d="M35 45 L37 51 L43 51 L38 55 L40 61 L35 57 L30 61 L32 55 L27 51 L33 51 Z" fill="#F6DF9E" stroke="#70564A" stroke-width="1.5"/>
+          <path d="M65 45 L67 51 L73 51 L68 55 L70 61 L65 57 L60 61 L62 55 L57 51 L63 51 Z" fill="#F6DF9E" stroke="#70564A" stroke-width="1.5"/>
+          <path d="M40 62 Q50 75 60 62 Q50 65 40 62" fill="#F4A88B" stroke="#70564A" stroke-width="2"/>
+          <path d="M15 20 L25 30 L18 32 L28 45" stroke="#F6DF9E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `,
+      calm: `
+        <svg class="mood-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10C23 10 10 27 10 50C10 73 23 90 50 90C77 90 90 73 90 50C90 27 77 10 50 10Z" fill="#FFF3E8" stroke="#70564A" stroke-width="4"/>
+          <path d="M15 45C15 20 30 15 50 15C70 15 85 20 85 45" stroke="#B3887D" stroke-width="8" stroke-linecap="round"/>
+          <path d="M25 40L35 50M75 40L65 50" stroke="#B3887D" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="26" cy="60" rx="8" ry="5" fill="#F4A88B" opacity="0.6"/>
+          <ellipse cx="74" cy="60" rx="8" ry="5" fill="#F4A88B" opacity="0.6"/>
+          <path d="M30 52 L40 52" stroke="#70564A" stroke-width="4" stroke-linecap="round"/>
+          <path d="M60 52 L70 52" stroke="#70564A" stroke-width="4" stroke-linecap="round"/>
+          <path d="M46 62 Q50 66 54 62" stroke="#70564A" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M80 25 L90 25 L80 35 L90 35" stroke="#B2CDE0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `,
+      romantic: `
+        <svg class="mood-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10C23 10 10 27 10 50C10 73 23 90 50 90C77 90 90 73 90 50C90 27 77 10 50 10Z" fill="#FFF3E8" stroke="#70564A" stroke-width="4"/>
+          <path d="M15 45C15 20 30 15 50 15C70 15 85 20 85 45" stroke="#B3887D" stroke-width="8" stroke-linecap="round"/>
+          <path d="M25 40L35 50M75 40L65 50" stroke="#B3887D" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="24" cy="60" rx="9" ry="6" fill="#F4A88B" opacity="0.8"/>
+          <ellipse cx="76" cy="60" rx="9" ry="6" fill="#F4A88B" opacity="0.8"/>
+          <path d="M35 48 C33 44 27 45 29 51 C30 54 35 57 35 57 C35 57 40 54 41 51 C43 45 37 44 35 48 Z" fill="#F4A88B" stroke="#70564A" stroke-width="2"/>
+          <path d="M65 48 C63 44 57 45 59 51 C60 54 65 57 65 57 C65 57 70 54 71 51 C73 45 67 44 65 48 Z" fill="#F4A88B" stroke="#70564A" stroke-width="2"/>
+          <path d="M46 62 Q50 66 54 62" stroke="#70564A" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M85 25 C84 22 80 23 81 27 C82 29 85 31 85 31 C85 31 88 29 89 27 C90 23 86 22 85 25 Z" fill="#F4A88B"/>
+        </svg>
+      `
     };
 
     const MOODS = {
       happy: {
-        emoji: "😊",
         label: { zh: "开心", en: "Happy" },
-        songs: [
-          { title: "好心情", subtitle: "Good Mood", artist: "李玟" },
-          { title: "稻香", subtitle: "Rice Field", artist: "周杰伦" },
-          { title: "彩虹的微笑", subtitle: "Rainbow Smile", artist: "王心凌" },
-          { title: "第一天", subtitle: "First Day", artist: "孙燕姿" },
-          { title: "日不落", subtitle: "Sun Never Sets", artist: "蔡依林" },
-          { title: "恋爱ing", subtitle: "Love-ing", artist: "五月天" },
-          { title: "快乐崇拜", subtitle: "Happy Worship", artist: "潘玮柏 / 张韶涵" },
-          { title: "阳光彩虹小白马", subtitle: "Sunshine Rainbow Little White Horse", artist: "大张伟" },
-          { title: "我的未来式", subtitle: "My Future Style", artist: "郭采洁" },
-          { title: "桃花朵朵开", subtitle: "Peach Blossoms Bloom", artist: "阿牛" },
-          { title: "爱的主打歌", subtitle: "Love's Signature Song", artist: "萧亚轩" },
-          { title: "欧若拉", subtitle: "Aurora", artist: "张韶涵" },
-          { title: "酸甜", subtitle: "Sweet and Sour", artist: "S.H.E / 飞轮海" },
-          { title: "海芋恋", subtitle: "Calla Lily Love", artist: "萧敬腾" },
-          { title: "凑热闹", subtitle: "Join the Fun", artist: "By2" },
-          { title: "马德里不思议", subtitle: "Madrid Mystery", artist: "蔡依林" },
-          { title: "快乐女孩", subtitle: "Happy Girl", artist: "刘惜君" },
-          { title: "娃娃脸", subtitle: "Baby Face", artist: "后弦" },
-          { title: "超喜欢你", subtitle: "Like You So Much", artist: "飞轮海" },
-          { title: "小小虫", subtitle: "Little Bug", artist: "方大同" }
-        ]
+        songs: {
+          zh: [
+            { title: "好心情", artist: "李玟" }, { title: "稻香", artist: "周杰伦" },
+            { title: "彩虹的微笑", artist: "王心凌" }, { title: "第一天", artist: "孙燕姿" },
+            { title: "日不落", artist: "蔡依林" }, { title: "恋爱ing", artist: "五月天" },
+            { title: "快乐崇拜", artist: "潘玮柏 / 张韶涵" }, { title: "阳光彩虹小白马", artist: "大张伟" },
+            { title: "我的未来式", artist: "郭采洁" }, { title: "桃花朵朵开", artist: "阿牛" },
+            { title: "爱的主打歌", artist: "萧亚轩" }, { title: "欧若拉", artist: "张韶涵" },
+            { title: "酸甜", artist: "S.H.E / 飞轮海" }, { title: "海芋恋", artist: "萧敬腾" },
+            { title: "凑热闹", artist: "By2" }, { title: "马德里不思议", artist: "蔡依林" },
+            { title: "快乐女孩", artist: "刘惜君" }, { title: "娃娃脸", artist: "后弦" },
+            { title: "超喜欢你", artist: "飞轮海" }, { title: "小小虫", artist: "方大同" }
+          ],
+          en: [
+            { title: "Happy", artist: "Pharrell Williams" }, { title: "Walking on Sunshine", artist: "Katrina and the Waves" },
+            { title: "Good as Hell", artist: "Lizzo" }, { title: "Can't Stop the Feeling!", artist: "Justin Timberlake" },
+            { title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars" }, { title: "September", artist: "Earth, Wind & Fire" },
+            { title: "Lovely Day", artist: "Bill Withers" }, { title: "Best Day of My Life", artist: "American Authors" },
+            { title: "On Top of the World", artist: "Imagine Dragons" }, { title: "I Gotta Feeling", artist: "The Black Eyed Peas" },
+            { title: "Dancing Queen", artist: "ABBA" }, { title: "Don't Worry, Be Happy", artist: "Bobby McFerrin" },
+            { title: "Here Comes the Sun", artist: "The Beatles" }, { title: "Good Vibrations", artist: "The Beach Boys" },
+            { title: "Shake It Off", artist: "Taylor Swift" }, { title: "Sunroof", artist: "Nicky Youre and dazy" },
+            { title: "Levitating", artist: "Dua Lipa" }, { title: "Three Little Birds", artist: "Bob Marley & The Wailers" },
+            { title: "Mr. Blue Sky", artist: "Electric Light Orchestra" }, { title: "I'm a Believer", artist: "The Monkees" }
+          ]
+        }
       },
-
       sad: {
-        emoji: "😢",
         label: { zh: "伤感", en: "Sad" },
-        songs: [
-          { title: "慢冷", subtitle: "Slowly Cold", artist: "梁静茹" },
-          { title: "不遗憾", subtitle: "No Regrets", artist: "李荣浩" },
-          { title: "唯一", subtitle: "Only", artist: "告五人" },
-          { title: "猜不透", subtitle: "Can't Figure Out", artist: "丁当" },
-          { title: "如果你也听说", subtitle: "If You've Heard", artist: "张惠妹" },
-          { title: "雨下一整晚", subtitle: "Raining All Night", artist: "周杰伦" },
-          { title: "带我走", subtitle: "Take Me Away", artist: "杨丞琳" },
-          { title: "一样的月光", subtitle: "Same Moonlight", artist: "徐佳莹" },
-          { title: "背叛", subtitle: "Betrayal", artist: "曹格" },
-          { title: "童话", subtitle: "Fairy Tale", artist: "光良" },
-          { title: "无人知晓的我", subtitle: "The Me Nobody Knows", artist: "A-Lin" },
-          { title: "爱情讯息", subtitle: "Love Message", artist: "郭静" },
-          { title: "最初的记忆", subtitle: "First Memory", artist: "徐佳莹" },
-          { title: "拉过勾的", subtitle: "Pinky Promise", artist: "陆虎" },
-          { title: "同花顺", subtitle: "Flush", artist: "林其玉" },
-          { title: "命运", subtitle: "Fate", artist: "家家" },
-          { title: "失眠", subtitle: "Insomnia", artist: "Suki 刘舒妤" },
-          { title: "碎碎念", subtitle: "Muttering", artist: "队长" },
-          { title: "如果呢", subtitle: "What If", artist: "郑润泽" },
-          { title: "用背脊唱情歌", subtitle: "Singing Love Songs with My Back", artist: "汤令山" }
-        ]
+        songs: {
+          zh: [
+            { title: "慢冷", artist: "梁静茹" }, { title: "不遗憾", artist: "李荣浩" },
+            { title: "唯一", artist: "告五人" }, { title: "猜不透", artist: "丁当" },
+            { title: "如果你也听说", artist: "张惠妹" }, { title: "雨下一整晚", artist: "周杰伦" },
+            { title: "带我走", artist: "杨丞琳" }, { title: "一样的月光", artist: "徐佳莹" },
+            { title: "背叛", artist: "曹格" }, { title: "童话", artist: "光良" },
+            { title: "无人知晓的我", artist: "A-Lin" }, { title: "爱情讯息", artist: "郭静" },
+            { title: "最初的记忆", artist: "徐佳莹" }, { title: "拉过勾的", artist: "陆虎" },
+            { title: "修炼爱情", artist: "林俊杰" }, { title: "命运", artist: "家家" },
+            { title: "说散就散", artist: "JC 陈泳彤" }, { title: "可不可以", artist: "张紫豪" },
+            { title: "如果呢", artist: "郑润泽" }, { title: "用背脊唱情歌", artist: "汤令山" }
+          ],
+          en: [
+            { title: "Someone Like You", artist: "Adele" }, { title: "Fix You", artist: "Coldplay" },
+            { title: "Skinny Love", artist: "Bon Iver" }, { title: "The Night We Met", artist: "Lord Huron" },
+            { title: "All I Want", artist: "Kodaline" }, { title: "Nothing Compares 2 U", artist: "Sinéad O'Connor" },
+            { title: "Everybody Hurts", artist: "R.E.M." }, { title: "Hurt", artist: "Johnny Cash" },
+            { title: "Liability", artist: "Lorde" }, { title: "when the party's over", artist: "Billie Eilish" },
+            { title: "Say Something", artist: "A Great Big World and Christina Aguilera" }, { title: "I Can't Make You Love Me", artist: "Bonnie Raitt" },
+            { title: "Jealous", artist: "Labrinth" }, { title: "Back to Black", artist: "Amy Winehouse" },
+            { title: "Lost on You", artist: "LP" }, { title: "Let Her Go", artist: "Passenger" },
+            { title: "Breakeven", artist: "The Script" }, { title: "drivers license", artist: "Olivia Rodrigo" },
+            { title: "Someone You Loved", artist: "Lewis Capaldi" }, { title: "Fourth of July", artist: "Sufjan Stevens" }
+          ]
+        }
       },
-
       energetic: {
-        emoji: "⚡",
         label: { zh: "活力", en: "Energetic" },
-        songs: [
-          { title: "光年之外", subtitle: "Light Years Away", artist: "邓紫棋" },
-          { title: "阳光宅男", subtitle: "Sunshine Otaku", artist: "周杰伦" },
-          { title: "Play我呸", subtitle: "Play I Pfft", artist: "蔡依林" },
-          { title: "王妃", subtitle: "Princess", artist: "萧敬腾" },
-          { title: "将军令", subtitle: "General's Order", artist: "吴克群" },
-          { title: "曹操", subtitle: "Cao Cao", artist: "林俊杰" },
-          { title: "逆战", subtitle: "Reverse War", artist: "张杰" },
-          { title: "着魔", subtitle: "Obsessed", artist: "张杰" },
-          { title: "即刻出发", subtitle: "Set Off Now", artist: "吉克隽逸" },
-          { title: "热血无赖", subtitle: "Hot-Blooded Rogue", artist: "邓紫棋" },
-          { title: "饿狼传说", subtitle: "Legend of the Hungry Wolf", artist: "张学友" },
-          { title: "头发乱了", subtitle: "Hair Messed Up", artist: "张学友" },
-          { title: "眉飞色舞", subtitle: "Beaming with Joy", artist: "郑秀文" },
-          { title: "不如跳舞", subtitle: "Better Dance", artist: "陈慧琳" },
-          { title: "花花宇宙", subtitle: "Flower Universe", artist: "陈慧琳" },
-          { title: "Monica", subtitle: "Monica", artist: "张国荣" },
-          { title: "不羁的风", subtitle: "Unrestrained Wind", artist: "张国荣" },
-          { title: "全日爱", subtitle: "All-Day Love", artist: "黎明" },
-          { title: "眼睛想旅行", subtitle: "Eyes Want to Travel", artist: "黎明" },
-          { title: "煞科", subtitle: "Finale", artist: "郑秀文" }
-        ]
+        songs: {
+          zh: [
+            { title: "光年之外", artist: "邓紫棋" }, { title: "阳光宅男", artist: "周杰伦" },
+            { title: "Play我呸", artist: "蔡依林" }, { title: "王妃", artist: "萧敬腾" },
+            { title: "将军令", artist: "吴克群" }, { title: "曹操", artist: "林俊杰" },
+            { title: "逆战", artist: "张杰" }, { title: "着魔", artist: "张杰" },
+            { title: "即刻出发", artist: "吉克隽逸" }, { title: "热血无赖", artist: "邓紫棋" },
+            { title: "饿狼传说", artist: "张学友" }, { title: "头发乱了", artist: "张学友" },
+            { title: "眉飞色舞", artist: "郑秀文" }, { title: "不如跳舞", artist: "陈慧琳" },
+            { title: "花花宇宙", artist: "陈慧琳" }, { title: "Monica", artist: "张国荣" },
+            { title: "不羁的风", artist: "张国荣" }, { title: "全日爱", artist: "黎明" },
+            { title: "眼睛想旅行", artist: "黎明" }, { title: "煞科", artist: "郑秀文" }
+          ],
+          en: [
+            { title: "Don't Stop Me Now", artist: "Queen" }, { title: "Eye of the Tiger", artist: "Survivor" },
+            { title: "Stronger (What Doesn't Kill You)", artist: "Kelly Clarkson" }, { title: "Titanium", artist: "David Guetta ft. Sia" },
+            { title: "Levels", artist: "Avicii" }, { title: "Pump It", artist: "The Black Eyed Peas" },
+            { title: "Lose Yourself", artist: "Eminem" }, { title: "Can't Hold Us", artist: "Macklemore & Ryan Lewis ft. Ray Dalton" },
+            { title: "Blinding Lights", artist: "The Weeknd" }, { title: "Physical", artist: "Dua Lipa" },
+            { title: "Born to Run", artist: "Bruce Springsteen" }, { title: "Thunderstruck", artist: "AC/DC" },
+            { title: "Party Rock Anthem", artist: "LMFAO" }, { title: "Bang Bang", artist: "Jessie J, Ariana Grande and Nicki Minaj" },
+            { title: "Run the World (Girls)", artist: "Beyoncé" }, { title: "High Hopes", artist: "Panic! at the Disco" },
+            { title: "The Pretender", artist: "Foo Fighters" }, { title: "Sandstorm", artist: "Darude" },
+            { title: "Turn Down for What", artist: "DJ Snake and Lil Jon" }, { title: "Firework", artist: "Katy Perry" }
+          ]
+        }
       },
-
       calm: {
-        emoji: "😌",
         label: { zh: "平静", en: "Calm" },
-        songs: [
-          { title: "山茶花开了", subtitle: "Camellia Bloomed", artist: "民歌风格原创" },
-          { title: "尘光慢语", subtitle: "Slow Words of Dust and Light", artist: "民歌风格原创" },
-          { title: "一叶知秋", subtitle: "One Leaf Signals Autumn", artist: "民歌风格原创" },
-          { title: "夏至的夜", subtitle: "Midsummer Night", artist: "民歌风格原创" },
-          { title: "海风拂过", subtitle: "Sea Breeze Brushes By", artist: "民歌风格原创" },
-          { title: "风里的车票", subtitle: "Ticket in the Wind", artist: "民歌风格原创" },
-          { title: "把远方折好", subtitle: "Fold the Distance Away", artist: "民歌风格原创" },
-          { title: "北站", subtitle: "North Station", artist: "民歌风格原创" },
-          { title: "山海路口", subtitle: "Mountain-Sea Crossing", artist: "民歌风格原创" },
-          { title: "给远路的情书", subtitle: "Love Letter to the Long Road", artist: "民歌风格原创" },
-          { title: "雾渡相思", subtitle: "Crossing Yearning in Mist", artist: "民歌风格原创" },
-          { title: "月下的小广场", subtitle: "Little Square Under the Moon", artist: "民歌风格原创" },
-          { title: "花径晴光", subtitle: "Sunlight on Flower Path", artist: "民歌风格原创" },
-          { title: "把月色交给你", subtitle: "Give You the Moonlight", artist: "民歌风格原创" },
-          { title: "窗纱轻落", subtitle: "Window Gauze Falls Gently", artist: "民歌风格原创" },
-          { title: "寻你千百度", subtitle: "Searching for You a Thousand Times", artist: "深夜小酒馆" },
-          { title: "晚风里的折叠", subtitle: "Folding in the Evening Breeze", artist: "深夜小酒馆" },
-          { title: "未落款的长情", subtitle: "Unsigned Long Love", artist: "深夜小酒馆" },
-          { title: "那一秒的惊艳", subtitle: "That Second of Splendor", artist: "深夜小酒馆" },
-          { title: "时光的朱砂", subtitle: "Cinnabar of Time", artist: "深夜小酒馆" }
-        ]
+        songs: {
+          zh: [
+            { title: "平凡之路", artist: "朴树" }, { title: "南山南", artist: "马頔" },
+            { title: "成都", artist: "赵雷" }, { title: "春风十里", artist: "鹿先森乐队" },
+            { title: "去大理", artist: "郝云" }, { title: "理想三旬", artist: "陈鸿宇" },
+            { title: "小半", artist: "陈粒" }, { title: "走马", artist: "陈粒" },
+            { title: "借我", artist: "谢春花" }, { title: "遥远的歌", artist: "刘惜君" },
+            { title: "慢慢喜欢你", artist: "莫文蔚" }, { title: "我要我们在一起", artist: "范晓萱" },
+            { title: "遇见", artist: "孙燕姿" }, { title: "旅行的意义", artist: "陈绮贞" },
+            { title: "鱼", artist: "陈绮贞" }, { title: "红豆", artist: "王菲" },
+            { title: "暧昧", artist: "王菲" }, { title: "贝加尔湖畔", artist: "李健" },
+            { title: "风吹麦浪", artist: "李健" }, { title: "消愁", artist: "毛不易" }
+          ],
+          en: [
+            { title: "Weightless", artist: "Marconi Union" }, { title: "Holocene", artist: "Bon Iver" },
+            { title: "Bloom", artist: "The Paper Kites" }, { title: "Banana Pancakes", artist: "Jack Johnson" },
+            { title: "Better Together", artist: "Jack Johnson" }, { title: "River Flows in You", artist: "Yiruma" },
+            { title: "Clair de Lune", artist: "Claude Debussy" }, { title: "Sunset Lover", artist: "Petit Biscuit" },
+            { title: "Heartbeats", artist: "José González" }, { title: "Come Away with Me", artist: "Norah Jones" },
+            { title: "Pink Moon", artist: "Nick Drake" }, { title: "Mystery of Love", artist: "Sufjan Stevens" },
+            { title: "Sea of Love", artist: "Cat Power" }, { title: "The Only Living Boy in New York", artist: "Simon & Garfunkel" },
+            { title: "re: Stacks", artist: "Bon Iver" }, { title: "To Build a Home", artist: "The Cinematic Orchestra" },
+            { title: "Dreams", artist: "Fleetwood Mac" }, { title: "Harvest Moon", artist: "Neil Young" },
+            { title: "Aqueous Transmission", artist: "Incubus" }, { title: "Nuvole Bianche", artist: "Ludovico Einaudi" }
+          ]
+        }
       },
-
       romantic: {
-        emoji: "😍",
         label: { zh: "浪漫", en: "Romantic" },
-        songs: [
-          { title: "月亮代表我的心", subtitle: "The Moon Represents My Heart", artist: "邓丽君" },
-          { title: "甜蜜蜜", subtitle: "Sweet Honey", artist: "邓丽君" },
-          { title: "我愿意", subtitle: "I Do", artist: "王菲" },
-          { title: "最浪漫的事", subtitle: "The Most Romantic Thing", artist: "赵咏华" },
-          { title: "明明白白我的心", subtitle: "My Heart Is Clear", artist: "成龙 / 陈淑桦" },
-          { title: "明天我要嫁给你", subtitle: "Tomorrow I'll Marry You", artist: "周华健" },
-          { title: "喜欢你", subtitle: "Like You", artist: "Beyond" },
-          { title: "爱情宣言", subtitle: "Love Declaration", artist: "齐秦" },
-          { title: "爱的代价", subtitle: "The Price of Love", artist: "张艾嘉" },
-          { title: "每天爱你多一些", subtitle: "Love You a Little More Every Day", artist: "张学友" },
-          { title: "相依为命", subtitle: "Depend on Each Other", artist: "陈小春" },
-          { title: "我的宣言", subtitle: "My Declaration", artist: "周柏豪" },
-          { title: "今生今世", subtitle: "This Life and Beyond", artist: "张国荣" },
-          { title: "天下无双", subtitle: "Peerless", artist: "陈奕迅" },
-          { title: "我们万岁", subtitle: "Long Live Us", artist: "陈奕迅" },
-          { title: "分分钟需要你", subtitle: "Need You Every Minute", artist: "林子祥" },
-          { title: "陪着你走", subtitle: "Walk with You", artist: "卢冠廷" },
-          { title: "一生爱你一个", subtitle: "Love Only You in This Life", artist: "郑伊健" },
-          { title: "三生有幸", subtitle: "Fortunate for Three Lives", artist: "郑中基" },
-          { title: "难得一遇", subtitle: "Rare Encounter", artist: "林奕匡" }
-        ]
+        songs: {
+          zh: [
+            { title: "月亮代表我的心", artist: "邓丽君" }, { title: "甜蜜蜜", artist: "邓丽君" },
+            { title: "我愿意", artist: "王菲" }, { title: "最浪漫的事", artist: "赵咏华" },
+            { title: "明明白白我的心", artist: "成龙 / 陈淑桦" }, { title: "明天我要嫁给你", artist: "周华健" },
+            { title: "喜欢你", artist: "Beyond" }, { title: "爱情宣言", artist: "齐秦" },
+            { title: "爱的代价", artist: "张艾嘉" }, { title: "每天爱你多一些", artist: "张学友" },
+            { title: "相依为命", artist: "陈小春" }, { title: "我的宣言", artist: "周柏豪" },
+            { title: "今生今世", artist: "张国荣" }, { title: "天下无双", artist: "陈奕迅" },
+            { title: "我们万岁", artist: "陈奕迅" }, { title: "分分钟需要你", artist: "林子祥" },
+            { title: "陪着你走", artist: "卢冠廷" }, { title: "一生爱你一个", artist: "郑伊健" },
+            { title: "三生有幸", artist: "郑中基" }, { title: "难得一遇", artist: "林奕匡" }
+          ],
+          en: [
+            { title: "Perfect", artist: "Ed Sheeran" }, { title: "All of Me", artist: "John Legend" },
+            { title: "At Last", artist: "Etta James" }, { title: "Lover", artist: "Taylor Swift" },
+            { title: "Thinking Out Loud", artist: "Ed Sheeran" }, { title: "Can't Help Falling in Love", artist: "Elvis Presley" },
+            { title: "A Thousand Years", artist: "Christina Perri" }, { title: "Make You Feel My Love", artist: "Adele" },
+            { title: "Just the Way You Are", artist: "Bruno Mars" }, { title: "Adore You", artist: "Harry Styles" },
+            { title: "Until I Found You", artist: "Stephen Sanchez" }, { title: "Let's Stay Together", artist: "Al Green" },
+            { title: "Your Song", artist: "Elton John" }, { title: "Kiss Me", artist: "Sixpence None the Richer" },
+            { title: "You Are the Best Thing", artist: "Ray LaMontagne" }, { title: "Beyond", artist: "Leon Bridges" },
+            { title: "Die with a Smile", artist: "Lady Gaga and Bruno Mars" }, { title: "La Vie en rose", artist: "Édith Piaf" },
+            { title: "Unchained Melody", artist: "The Righteous Brothers" }, { title: "Something", artist: "The Beatles" }
+          ]
+        }
       }
     };
 
     const MOOD_KEYS = Object.keys(MOODS);
     const selectedMoods = new Set();
     let lang = "zh";
+    let currentRecommendationState = null;
 
     const pageTitle = document.getElementById("pageTitle");
     const pageIntro = document.getElementById("pageIntro");
@@ -504,41 +716,433 @@
     const status = document.getElementById("status");
     const recommendations = document.getElementById("recommendations");
 
+    const playbackCache = new Map();
+    let currentAudio = null;
+    let currentPreviewButton = null;
+    let currentLyricsPanel = null;
+    let currentAudioOffset = 0;
+    let rafId = null;
+
+    function previewLabel(state) { return t(`preview.${state}`); }
+
+    function updatePreviewButton(button, state) {
+      if (!button) return;
+      button.dataset.state = state;
+      button.textContent = previewLabel(state);
+      button.disabled = state === "unavailable";
+    }
+
+    function normalizeUrl(url) {
+      if (!url) return null;
+      if (url.startsWith("//")) return "https:" + url;
+      if (url.startsWith("http://")) return "https://" + url.slice(7);
+      return url;
+    }
+
+    async function fetchPlayback(title, artist) {
+      const key = `${title}|${artist}`;
+      if (playbackCache.has(key)) return playbackCache.get(key);
+
+      let result = { url: null, lrc: null, fullTrack: false };
+      const queries = [`${title} ${artist}`, title];
+      let hitId = null;
+
+      for (const q of queries) {
+        try {
+          const searchUrl = "https://music-api.gdstudio.xyz/api.php?types=search&source=netease" + `&name=${encodeURIComponent(q)}&count=10&pages=1`;
+          const res = await fetch(searchUrl);
+          if (!res.ok) continue;
+          const list = await res.json();
+          if (!Array.isArray(list) || !list.length) continue;
+
+          const titleLower = title.toLowerCase();
+          const exact = list.find((item) => (item.name || "").toLowerCase() === titleLower);
+          const contains = list.find((item) => (item.name || "").toLowerCase().includes(titleLower));
+          const hit = exact || contains || list[0];
+          if (hit && hit.id) { hitId = hit.id; break; }
+        } catch (e) { /* 继续 */ }
+      }
+
+      if (hitId) {
+        try {
+          const [urlRes, lyricRes] = await Promise.all([
+            fetch(`https://music-api.gdstudio.xyz/api.php?types=url&source=netease&id=${hitId}&br=320`),
+            fetch(`https://music-api.gdstudio.xyz/api.php?types=lyric&source=netease&id=${hitId}`)
+          ]);
+
+          let url = null;
+          let lrc = null;
+
+          if (urlRes.ok) {
+            const data = await urlRes.json();
+            if (data && data.url) url = normalizeUrl(data.url);
+          }
+          if (lyricRes.ok) {
+            const data = await lyricRes.json();
+            if (data) {
+              const candidates = [data.lyric, data.tlyric, data.rlyric];
+              for (const c of candidates) {
+                if (c && typeof c === "string" && /\[\d{1,3}:\d{1,2}/.test(c)) { lrc = c; break; }
+              }
+            }
+          }
+
+          if (url) {
+            result = { url, lrc, fullTrack: true };
+            playbackCache.set(key, result);
+            return result;
+          }
+        } catch (e) { /* 回退 */ }
+      }
+
+      let fallbackUrl = await fetchDeezerPreview(title, artist);
+      if (!fallbackUrl) fallbackUrl = await fetchItunesPreview(title, artist);
+
+      if (fallbackUrl) {
+        let lrc = null;
+        try {
+          const res = await fetch(`https://lrclib.net/api/get?track_name=${encodeURIComponent(title)}&artist_name=${encodeURIComponent(artist)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.syncedLyrics) lrc = data.syncedLyrics;
+          }
+        } catch (e) { /* 静默 */ }
+        result = { url: fallbackUrl, lrc, fullTrack: false };
+      }
+
+      playbackCache.set(key, result);
+      return result;
+    }
+
+    function fetchDeezerPreview(title, artist) {
+      return new Promise((resolve) => {
+        const cb = `dz_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const script = document.createElement("script");
+        let done = false;
+        const finish = (v) => {
+          if (done) return; done = true; clearTimeout(timer);
+          if (script.parentNode) script.parentNode.removeChild(script);
+          try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+          resolve(v);
+        };
+        const timer = setTimeout(() => finish(null), 6000);
+        window[cb] = (data) => {
+          let url = null;
+          if (data && Array.isArray(data.data)) {
+            const exact = data.data.find((item) => (item.title || "").toLowerCase() === title.toLowerCase() && item.preview);
+            url = exact ? exact.preview : (data.data.find((item) => item.preview) || {}).preview || null;
+          }
+          finish(url);
+        };
+        script.onerror = () => finish(null);
+        script.src = `https://api.deezer.com/search?q=${encodeURIComponent(`${title} ${artist}`)}&output=jsonp&callback=${cb}`;
+        document.body.appendChild(script);
+      });
+    }
+
+    function fetchItunesPreview(title, artist) {
+      return new Promise((resolve) => {
+        const cb = `it_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const script = document.createElement("script");
+        let done = false;
+        const finish = (v) => {
+          if (done) return; done = true; clearTimeout(timer);
+          if (script.parentNode) script.parentNode.removeChild(script);
+          try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+          resolve(v);
+        };
+        const timer = setTimeout(() => finish(null), 8000);
+        window[cb] = (data) => {
+          let url = null;
+          if (data && Array.isArray(data.results)) {
+            const match = data.results.find((item) => item.previewUrl);
+            if (match) url = match.previewUrl;
+          }
+          finish(url);
+        };
+        script.onerror = () => finish(null);
+        script.src = `https://itunes.apple.com/search?term=${encodeURIComponent(`${title} ${artist}`)}&media=music&limit=5&callback=${cb}`;
+        document.body.appendChild(script);
+      });
+    }
+
+    const META_LINE_RE = /^(作词|作曲|编曲|词|曲|编|制作人|监制|混音|母带|和声|录音|吉他|贝斯|鼓|键盘|弦乐|出品|发行|OP|SP|Presented|Produced|Composed|Arranged|Lyrics|Lyricist|Music|Producer|Written|Mixed|Mastered|Engineered|Vocals|Guitar|Bass|Drums|Keys|Strings|Recorded|Additional)/i;
+
+    function parseLRC(lrcText) {
+      if (!lrcText || typeof lrcText !== "string") return [];
+      const timeTagRe = /\[(\d{1,3}):(\d{1,2})(?:[.:](\d{1,3}))?\]/g;
+      if (!/\[\d{1,3}:\d{1,2}(?:[.:]\d{1,3})?\]/.test(lrcText)) return [];
+
+      let globalOffset = 0;
+      const offsetMatch = lrcText.match(/\[offset:\s*([+-]?\d+)\s*\]/i);
+      if (offsetMatch) globalOffset = parseInt(offsetMatch[1], 10) / 1000;
+
+      const metaTagRe = /^\[(ti|ar|al|by|offset|re|ve|kana|length|au|encoding|id|hash|total|sign|qq|url|tool|platform):/i;
+      const lines = [];
+
+      lrcText.split(/\r?\n/).forEach((raw) => {
+        if (!raw || metaTagRe.test(raw.trim())) return;
+        const matches = [...raw.matchAll(timeTagRe)];
+        if (!matches.length) return;
+
+        const lastMatch = matches[matches.length - 1];
+        const text = raw.slice(lastMatch.index + lastMatch[0].length).trim();
+        if (!text) return;
+
+        const tags = matches.map((m) => {
+          const min = parseInt(m[1], 10);
+          const sec = parseInt(m[2], 10);
+          const fracStr = m[3] || "0";
+          const frac = parseInt(fracStr.padEnd(3, "0").slice(0, 3), 10);
+          return min * 60 + sec + frac / 1000 - globalOffset;
+        });
+
+        const isMeta = META_LINE_RE.test(text);
+        tags.forEach((time) => {
+          if (Number.isFinite(time) && time >= 0) lines.push({ time, text, isMeta });
+        });
+      });
+
+      lines.sort((a, b) => a.time - b.time);
+
+      let firstBodyIdx = 0;
+      while (firstBodyIdx < lines.length && lines[firstBodyIdx].isMeta) firstBodyIdx++;
+
+      if (firstBodyIdx > 1) {
+        const nextTime = firstBodyIdx < lines.length ? lines[firstBodyIdx].time : 1;
+        const win = Math.min(0.4, Math.max(0.15, nextTime * 0.25));
+        const step = win / (firstBodyIdx - 1 || 1);
+        for (let i = 0; i < firstBodyIdx; i++) {
+          lines[i].time = i * step;
+          lines[i].isMeta = true;
+        }
+      }
+      return lines;
+    }
+
+    function renderLyrics(panel, lyrics) {
+      if (!lyrics.length) {
+        panel.innerHTML = `<p class="lyrics-status">${escapeHtml(t("lyrics.unavailable"))}</p>`;
+        panel.dataset.activeIndex = "-1";
+        panel.dataset.scrollIndex = "-1";
+        return;
+      }
+
+      panel.innerHTML = `<div class="lyrics-track">${lyrics
+        .map((l) => `<p class="lyric-line${l.isMeta ? " lyric-meta" : ""}" data-time="${l.time}">${escapeHtml(l.text)}</p>`)
+        .join("")}</div>`;
+
+      panel.dataset.activeIndex = "-1";
+      panel.dataset.scrollIndex = "-1";
+      panel.querySelector(".lyrics-track").style.transform = "translateY(0)";
+      requestAnimationFrame(() => updateLyricHighlight());
+    }
+
+    function updateLyricHighlight() {
+      if (!currentAudio || !currentLyricsPanel || currentLyricsPanel.hidden) return;
+      const track = currentLyricsPanel.querySelector(".lyrics-track");
+      if (!track) return;
+      const lines = track.querySelectorAll(".lyric-line");
+      if (!lines.length) return;
+
+      const now = currentAudio.currentTime + currentAudioOffset;
+      let activeIndex = -1;
+      for (let i = 0; i < lines.length; i++) {
+        const lt = parseFloat(lines[i].dataset.time);
+        if (Number.isFinite(lt) && lt <= now + 0.05) activeIndex = i;
+        else break;
+      }
+
+      let scrollIndex = activeIndex >= 0 ? activeIndex : 0;
+
+      const prevActive = parseInt(currentLyricsPanel.dataset.activeIndex ?? "-1", 10);
+      if (activeIndex !== prevActive) {
+        lines.forEach((l, i) => l.classList.toggle("active", i === activeIndex));
+        currentLyricsPanel.dataset.activeIndex = String(activeIndex);
+      }
+
+      const prevScroll = parseInt(currentLyricsPanel.dataset.scrollIndex ?? "-1", 10);
+      if (scrollIndex !== prevScroll) {
+        track.style.transform = `translateY(${-scrollIndex * 32}px)`;
+        currentLyricsPanel.dataset.scrollIndex = String(scrollIndex);
+      }
+    }
+
+    function startSyncLoop() {
+      if (rafId) return;
+      const tick = () => {
+        if (currentAudio && !currentAudio.paused) updateLyricHighlight();
+        rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function stopSyncLoop() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+
+    function stopPreview() {
+      stopSyncLoop();
+      if (currentAudio) { try { currentAudio.pause(); } catch (e) {} currentAudio = null; }
+      if (currentPreviewButton) {
+        updatePreviewButton(currentPreviewButton, "idle");
+        currentPreviewButton = null;
+      }
+      if (currentLyricsPanel) {
+        currentLyricsPanel.hidden = true;
+        currentLyricsPanel.innerHTML = "";
+        currentLyricsPanel = null;
+      }
+      currentAudioOffset = 0;
+    }
+
+    async function handlePreviewClick(song, button) {
+      if (currentPreviewButton === button && currentAudio) {
+        if (currentAudio.paused) {
+          try {
+            await currentAudio.play();
+            updatePreviewButton(button, "playing");
+            startSyncLoop();
+            updateLyricHighlight();
+          } catch (e) { updatePreviewButton(button, "idle"); }
+        } else {
+          currentAudio.pause();
+          updatePreviewButton(button, "paused");
+          stopSyncLoop();
+        }
+        return;
+      }
+
+      if (currentAudio || currentPreviewButton) stopPreview();
+      if (button.dataset.state === "unavailable") return;
+
+      const li = button.closest("li");
+      const panel = li ? li.querySelector(".lyrics-panel") : null;
+
+      if (panel) {
+        panel.hidden = false;
+        panel.innerHTML = `<p class="lyrics-status">${escapeHtml(t("lyrics.loading"))}</p>`;
+        panel.dataset.activeIndex = "-1";
+        panel.dataset.scrollIndex = "-1";
+      }
+
+      updatePreviewButton(button, "loading");
+      const playback = await fetchPlayback(song.title, song.artist);
+
+      if (!button.isConnected) return;
+
+      if (!playback.url) {
+        updatePreviewButton(button, "unavailable");
+        if (panel) { panel.hidden = true; panel.innerHTML = ""; }
+        return;
+      }
+
+      const lyrics = playback.lrc ? parseLRC(playback.lrc) : [];
+
+      currentAudioOffset = 0;
+      if (!playback.fullTrack && lyrics.length) {
+        const firstBody = lyrics.find((l) => !l.isMeta && l.time > 5);
+        if (firstBody) currentAudioOffset = Math.max(0, firstBody.time - 1.5);
+      }
+
+      if (panel) {
+        renderLyrics(panel, lyrics);
+        if (!playback.fullTrack && lyrics.length) {
+          const warn = document.createElement("div");
+          warn.className = "lyrics-warning";
+          warn.textContent = t("lyrics.fragmentWarning");
+          panel.appendChild(warn);
+        }
+      }
+
+      const audio = new Audio(playback.url);
+      audio.preload = "auto";
+      currentAudio = audio;
+      currentPreviewButton = button;
+      currentLyricsPanel = panel;
+
+      audio.addEventListener("loadedmetadata", () => {
+        if (!lyrics.length || !Number.isFinite(audio.duration)) return;
+        const lastLyricTime = lyrics[lyrics.length - 1].time;
+        const isFragment = lastLyricTime > 10 && audio.duration < lastLyricTime * 0.6;
+
+        if (isFragment && playback.fullTrack) {
+          const firstBody = lyrics.find((l) => !l.isMeta && l.time > 5);
+          if (firstBody) currentAudioOffset = Math.max(0, firstBody.time - 1.5);
+          updateLyricHighlight();
+          if (panel && !panel.querySelector(".lyrics-warning")) {
+            const warn = document.createElement("div");
+            warn.className = "lyrics-warning";
+            warn.textContent = t("lyrics.fragmentWarning");
+            panel.appendChild(warn);
+          }
+        }
+      });
+
+      audio.addEventListener("timeupdate", updateLyricHighlight);
+      audio.addEventListener("ended", () => {
+        if (currentPreviewButton === button) {
+          updatePreviewButton(button, "idle");
+          currentAudio = null;
+          currentPreviewButton = null;
+          stopSyncLoop();
+        }
+      });
+
+      audio.addEventListener("error", () => {
+        if (currentPreviewButton === button) {
+          updatePreviewButton(button, "unavailable");
+          button.dataset.previewUrl = "";
+          currentAudio = null;
+          currentPreviewButton = null;
+          stopSyncLoop();
+          if (currentLyricsPanel === panel) currentLyricsPanel = null;
+        }
+      });
+
+      updatePreviewButton(button, "playing");
+      try {
+        await audio.play();
+        updateLyricHighlight();
+        startSyncLoop();
+      } catch (e) {
+        updatePreviewButton(button, "idle");
+        if (currentPreviewButton === button) {
+          currentAudio = null;
+          currentPreviewButton = null;
+          stopSyncLoop();
+        }
+      }
+    }
+
     function t(key, vars = {}) {
-      const dictionary = UI[lang] || UI.zh;
-      const template = dictionary[key] || UI.zh[key] || key;
-
-      return template.replace(/\{(\w+)\}/g, (match, name) => {
-        if (Object.prototype.hasOwnProperty.call(vars, name)) {
-          return String(vars[name]);
-        }
-        if (name === "suffix") {
-          return lang === "en" && vars.count !== 1 ? "s" : "";
-        }
-        if (name === "moodSuffix") {
-          return lang === "en" && vars.moodCount !== 1 ? "s" : "";
-        }
-        return match;
+      const dict = UI[lang] || UI.zh;
+      const tpl = dict[key] || UI.zh[key] || key;
+      return tpl.replace(/\{(\w+)\}/g, (m, name) => {
+        if (Object.prototype.hasOwnProperty.call(vars, name)) return String(vars[name]);
+        if (name === "suffix") return lang === "en" && vars.count !== 1 ? "s" : "";
+        if (name === "moodSuffix") return lang === "en" && vars.moodCount !== 1 ? "s" : "";
+        return m;
       });
     }
 
-    function escapeHtml(value) {
-      return String(value).replace(/[&<>"']/g, (char) => {
-        const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-        return map[char];
-      });
+    function escapeHtml(v) {
+      return String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
     }
 
-    function moodLabel(moodKey) {
-      return MOODS[moodKey].label[lang];
+    function moodLabel(k) { return MOODS[k].label[lang]; }
+
+    function updateLanguageButtons() {
+      document.querySelectorAll(".lang-button").forEach((b) => {
+        const active = b.dataset.lang === lang;
+        b.classList.toggle("active", active);
+        b.setAttribute("aria-pressed", String(active));
+      });
     }
 
     function updateStaticText() {
       document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-      document.title = lang === "zh"
-        ? "心情音乐推荐器 | Mood Music Recommender"
-        : "Mood Music Recommender | 心情音乐推荐器";
-
+      document.title = lang === "zh" ? "心情音乐推荐器 | Mood Music Recommender" : "Mood Music Recommender | 心情音乐推荐器";
       pageTitle.textContent = t("page.title");
       pageIntro.textContent = t("page.intro");
       moodButtonsWrap.setAttribute("aria-label", t("moods.aria"));
@@ -546,7 +1150,6 @@
       recommendButton.textContent = t("button.recommend");
       clearButton.textContent = t("button.clear");
       recommendations.setAttribute("aria-label", t("recommendations.aria"));
-
       renderSongCountOptions();
       renderMoodButtons();
       updateStatus();
@@ -554,86 +1157,78 @@
     }
 
     function renderSongCountOptions() {
-      const currentValue = songCount.value || "3";
-      songCount.innerHTML = [1, 2, 3, 4, 5].map((count) => {
-        return `<option value="${count}">${escapeHtml(t("songCount.option", { count }))}</option>`;
-      }).join("");
-      songCount.value = currentValue;
+      const cur = songCount.value || "3";
+      songCount.innerHTML = [1, 2, 3, 4, 5]
+        .map((c) => `<option value="${c}">${escapeHtml(t("songCount.option", { count: c }))}</option>`)
+        .join("");
+      songCount.value = cur;
     }
 
     function renderMoodButtons() {
-      moodButtonsWrap.innerHTML = MOOD_KEYS.map((moodKey) => {
-        const mood = MOODS[moodKey];
-        const isSelected = selectedMoods.has(moodKey);
-
+      moodButtonsWrap.innerHTML = MOOD_KEYS.map((k) => {
+        const m = MOODS[k], sel = selectedMoods.has(k);
         return `
-          <button
-            class="mood-button ${isSelected ? "selected" : ""}"
-            type="button"
-            data-mood="${moodKey}"
-            aria-pressed="${isSelected}"
-          >
-            <span class="emoji" aria-hidden="true">${mood.emoji}</span>
-            <span class="mood-name">${escapeHtml(mood.label[lang])}</span>
-            <span class="checkmark" aria-hidden="true">${isSelected ? escapeHtml(t("selected.mark")) : ""}</span>
+          <button class="mood-button ${sel ? "selected" : ""}" type="button" data-mood="${k}" aria-pressed="${sel}">
+            ${SVG_ICONS[k]}
+            <span class="mood-name">${escapeHtml(m.label[lang])}</span>
+            <span class="checkmark" aria-hidden="true">${sel ? escapeHtml(t("selected.mark")) : ""}</span>
           </button>
         `;
       }).join("");
-
-      moodButtonsWrap.querySelectorAll(".mood-button").forEach((button) => {
-        button.addEventListener("click", () => toggleMood(button.dataset.mood));
+      moodButtonsWrap.querySelectorAll(".mood-button").forEach((b) => {
+        b.addEventListener("click", () => toggleMood(b.dataset.mood));
       });
     }
 
-    function toggleMood(moodKey) {
-      if (selectedMoods.has(moodKey)) {
-        selectedMoods.delete(moodKey);
-      } else {
-        selectedMoods.add(moodKey);
+    function toggleMood(k) {
+      if (selectedMoods.has(k)) selectedMoods.delete(k);
+      else selectedMoods.add(k);
+      if (currentRecommendationState) {
+        currentRecommendationState = null;
+        stopPreview();
+        recommendations.replaceChildren();
       }
-
       renderMoodButtons();
       updateStatus();
     }
 
     function updateStatus() {
       status.classList.remove("error");
-
       if (selectedMoods.size === 0) {
         status.textContent = t("status.noMoods");
         return;
       }
-
-      const names = [...selectedMoods].map((moodKey) => {
-        return `${MOODS[moodKey].emoji} ${moodLabel(moodKey)}`;
-      });
-
+      const names = [...selectedMoods].map((k) => `${moodLabel(k)}`); 
       status.textContent = t("status.selected", {
         count: selectedMoods.size,
         names: names.join(lang === "zh" ? "、" : ", ")
       });
     }
 
-    function getRandomSongs(songList, amount) {
-      const shuffled = [...songList];
-
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const randomIndex = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]];
+    function getRandomSongs(list, amount) {
+      const a = [...list];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
       }
-
-      return shuffled.slice(0, amount);
+      return a.slice(0, amount);
     }
 
-    let currentRecommendationState = null;
+    function generateRecommendation() {
+      const amount = Number(songCount.value);
+      const results = [...selectedMoods].map((k) => ({
+        moodKey: k,
+        songs: getRandomSongs(MOODS[k].songs[lang], amount)
+      }));
+      return { results, amount };
+    }
 
     function renderRecommendationsFromState() {
       if (!currentRecommendationState) {
         recommendations.replaceChildren();
         return;
       }
-
-      const { results, amount } = currentRecommendationState;
+      const { results } = currentRecommendationState;
       recommendations.replaceChildren();
 
       results.forEach(({ moodKey, songs }) => {
@@ -641,27 +1236,41 @@
         const section = document.createElement("article");
         const heading = document.createElement("h2");
         const list = document.createElement("ol");
-
         section.className = "mood-results";
         list.className = "song-list";
-
-        heading.textContent = `${mood.emoji} ${mood.label[lang]}`;
+        
+        const iconSvg = SVG_ICONS[moodKey].replace('class="mood-icon"', '');
+        heading.innerHTML = `${iconSvg} <span>${mood.label[lang]}</span>`;
 
         songs.forEach((song) => {
           const item = document.createElement("li");
+          const line = document.createElement("span");
           const title = document.createElement("span");
-          const subtitle = document.createElement("span");
           const artist = document.createElement("span");
+          const btn = document.createElement("button");
+          const panel = document.createElement("div");
 
+          line.className = "song-line";
           title.className = "song-title";
-          subtitle.className = "song-subtitle";
           artist.className = "artist";
-
           title.textContent = song.title;
-          subtitle.textContent = `（${t("song.subtitle")}: ${song.subtitle}）`;
-          artist.textContent = ` — ${song.artist}`;
+          artist.textContent = `  ${song.artist}`;
 
-          item.append(title, subtitle, artist);
+          btn.className = "preview-btn";
+          btn.type = "button";
+          btn.dataset.state = "idle";
+          btn.dataset.previewUrl = "";
+          btn.textContent = previewLabel("idle");
+          btn.addEventListener("click", () => handlePreviewClick(song, btn));
+
+          panel.className = "lyrics-panel";
+          panel.hidden = true;
+          panel.dataset.activeIndex = "-1";
+          panel.dataset.scrollIndex = "-1";
+          panel.setAttribute("aria-live", "polite");
+
+          line.append(title, artist, btn);
+          item.append(line, panel);
           list.appendChild(item);
         });
 
@@ -669,7 +1278,7 @@
         recommendations.appendChild(section);
       });
 
-      const total = selectedMoods.size * amount;
+      const total = selectedMoods.size * currentRecommendationState.amount;
       status.classList.remove("error");
       status.textContent = t("status.showing", {
         total,
@@ -678,6 +1287,7 @@
     }
 
     recommendButton.addEventListener("click", () => {
+      stopPreview();
       if (selectedMoods.size === 0) {
         status.textContent = t("status.error");
         status.classList.add("error");
@@ -685,18 +1295,12 @@
         currentRecommendationState = null;
         return;
       }
-
-      const amount = Number(songCount.value);
-      const results = [...selectedMoods].map((moodKey) => ({
-        moodKey,
-        songs: getRandomSongs(MOODS[moodKey].songs, amount)
-      }));
-
-      currentRecommendationState = { results, amount };
+      currentRecommendationState = generateRecommendation();
       renderRecommendationsFromState();
     });
 
     clearButton.addEventListener("click", () => {
+      stopPreview();
       selectedMoods.clear();
       currentRecommendationState = null;
       recommendations.replaceChildren();
@@ -704,21 +1308,16 @@
       updateStatus();
     });
 
-    document.querySelectorAll(".lang-button").forEach((button) => {
-      button.addEventListener("click", () => {
-        const nextLang = button.dataset.lang;
-        if (nextLang === lang) {
-          return;
+    document.querySelectorAll(".lang-button").forEach((b) => {
+      b.addEventListener("click", () => {
+        const next = b.dataset.lang;
+        if (next === lang) return;
+        stopPreview();
+        lang = next;
+        updateLanguageButtons();
+        if (currentRecommendationState) {
+          currentRecommendationState = generateRecommendation();
         }
-
-        lang = nextLang;
-
-        document.querySelectorAll(".lang-button").forEach((langButton) => {
-          const active = langButton.dataset.lang === lang;
-          langButton.classList.toggle("active", active);
-          langButton.setAttribute("aria-pressed", String(active));
-        });
-
         updateStaticText();
       });
     });
